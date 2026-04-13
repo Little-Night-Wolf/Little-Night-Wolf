@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="es">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Developer Portal</title>
+    <title>Developer Portal | Little-Night-Wolf</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
@@ -16,6 +16,7 @@
             --text-main: #f8fafc;
             --text-dim: #94a3b8;
             --glass: rgba(255, 255, 255, 0.03);
+            --border: rgba(255, 255, 255, 0.1);
         }
 
         * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -23,223 +24,205 @@
         body {
             font-family: 'Inter', sans-serif;
             background-color: var(--bg);
-            background-image: radial-gradient(circle at 0% 0%, rgba(99, 102, 241, 0.1) 0%, transparent 50%),
-                              radial-gradient(circle at 100% 100%, rgba(168, 85, 247, 0.1) 0%, transparent 50%);
+            background-image: 
+                radial-gradient(circle at 0% 0%, rgba(99, 102, 241, 0.15) 0%, transparent 50%),
+                radial-gradient(circle at 100% 100%, rgba(168, 85, 247, 0.15) 0%, transparent 50%);
             color: var(--text-main);
             min-height: 100vh;
             display: flex;
             flex-direction: column;
-            transition: all 0.5s ease;
+            overflow-x: hidden;
         }
 
-        /* --- Global Elements --- */
-        .container { max-width: 1100px; margin: 0 auto; padding: 40px 20px; width: 100%; }
-        .hidden { display: none !important; }
+        .container { max-width: 1100px; margin: 0 auto; padding: 60px 20px; width: 100%; }
+        
+        /* Loader */
+        #loader {
+            position: fixed; inset: 0; background: var(--bg);
+            display: flex; flex-direction: column; align-items: center; justify-content: center; z-index: 1000;
+        }
 
-        /* --- Full View Styles --- */
-        header { text-align: center; margin-bottom: 60px; }
-        #avatar { 
-            width: 140px; height: 140px; border-radius: 50%; 
+        /* Header */
+        header { text-align: center; margin-bottom: 60px; animation: fadeIn 0.8s ease; }
+        #main-avatar { 
+            width: 120px; height: 120px; border-radius: 50%; 
             border: 3px solid var(--primary); padding: 5px; margin-bottom: 20px;
+            object-fit: cover;
         }
+
+        /* Stats */
         .stats-grid { 
             display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); 
             gap: 20px; margin-bottom: 60px; 
         }
         .stat-box { 
-            background: var(--glass); border: 1px solid rgba(255,255,255,0.05);
-            padding: 20px; border-radius: 15px; text-align: center;
+            background: var(--glass); border: 1px solid var(--border);
+            padding: 25px; border-radius: 20px; text-align: center;
+            backdrop-filter: blur(10px);
         }
-        .stat-val { display: block; font-size: 1.8rem; font-weight: 800; color: var(--primary); }
-        .stat-lab { font-size: 0.7rem; text-transform: uppercase; color: var(--text-dim); letter-spacing: 1px; }
+        .stat-val { display: block; font-size: 2rem; font-weight: 800; color: var(--primary); }
+        .stat-lab { font-size: 0.75rem; text-transform: uppercase; color: var(--text-dim); letter-spacing: 1.5px; }
 
+        /* Repos */
         .repos-grid { 
-            display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 25px; 
+            display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 25px; 
         }
         .repo-card {
-            background: var(--card-bg); padding: 25px; border-radius: 20px;
-            border: 1px solid rgba(255,255,255,0.05); transition: 0.3s;
+            background: var(--card-bg); padding: 30px; border-radius: 24px;
+            border: 1px solid var(--border); transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
             text-decoration: none; color: inherit; display: flex; flex-direction: column;
+            backdrop-filter: blur(12px);
         }
-        .repo-card:hover { transform: translateY(-5px); border-color: var(--primary); }
-        .repo-title { font-weight: 700; color: var(--primary); margin-bottom: 10px; }
-        .repo-desc { font-size: 0.9rem; color: var(--text-dim); flex-grow: 1; margin-bottom: 15px; }
+        .repo-card:hover { transform: translateY(-10px); border-color: var(--primary); box-shadow: 0 20px 40px rgba(0,0,0,0.3); }
+        .repo-title { font-size: 1.2rem; font-weight: 700; color: var(--primary); margin-bottom: 12px; }
+        .repo-desc { font-size: 0.95rem; color: var(--text-dim); flex-grow: 1; margin-bottom: 20px; line-height: 1.6; }
 
-        /* --- Card View Mode (?view=card) --- */
-        body.mode-card { justify-content: center; align-items: center; }
-        .mode-card .full-content { display: none; }
-        .mode-card .card-wrapper {
-            display: block; width: 380px; background: var(--card-bg);
-            backdrop-filter: blur(20px); border-radius: 30px; padding: 40px;
-            border: 1px solid rgba(255,255,255,0.1); text-align: center;
-            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
-            animation: slideIn 0.6s cubic-bezier(0.23, 1, 0.32, 1);
+        .repo-meta { display: flex; align-items: center; gap: 15px; font-size: 0.8rem; color: var(--text-dim); }
+        .lang-dot { width: 10px; height: 10px; border-radius: 50%; background: var(--primary); }
+
+        /* Animations */
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+        .hidden { display: none !important; }
+
+        @media (max-width: 600px) {
+            .stats-grid { grid-template-columns: 1fr 1fr; }
         }
-        .mode-card #avatar { width: 110px; height: 110px; }
-        .card-stats { display: flex; justify-content: space-around; margin-top: 30px; border-top: 1px solid rgba(255,255,255,0.05); padding-top: 20px; }
-
-        @keyframes slideIn { from { opacity: 0; transform: translateY(30px); } to { opacity: 1; transform: translateY(0); } }
-
-        /* Loader */
-        .loading-screen { position: fixed; inset: 0; background: var(--bg); display: flex; align-items: center; justify-content: center; z-index: 100; }
     </style>
 </head>
 <body>
 
-    <div id="loader" class="loading-screen"><i class="fas fa-circle-notch fa-spin fa-2x" style="color:var(--primary)"></i></div>
+    <div id="loader">
+        <i class="fas fa-circle-notch fa-spin fa-3x" style="color:var(--primary); margin-bottom: 20px;"></i>
+        <p id="loader-text">Cargando universo digital...</p>
+    </div>
 
-    <main class="container full-content">
+    <main class="container" id="main-content">
         <header>
-            <img id="main-avatar" src="" alt="Avatar">
-            <h1 id="main-name">...</h1>
-            <p id="main-bio" style="color:var(--text-dim); margin-top:10px;"></p>
+            <img id="main-avatar" src="https://via.placeholder.com/150" alt="Avatar">
+            <h1 id="main-name">Cargando...</h1>
+            <p id="main-bio" style="color:var(--text-dim); margin-top:10px; max-width: 600px; margin-inline: auto;"></p>
         </header>
 
-        <div class="stats-grid">
+        <section class="stats-grid">
             <div class="stat-box">
                 <span class="stat-val" id="stat-repos">0</span>
-                <span class="stat-lab" data-i18n="repos">Repositories</span>
+                <span class="stat-lab">Repositorios</span>
             </div>
             <div class="stat-box">
                 <span class="stat-val" id="stat-followers">0</span>
-                <span class="stat-lab" data-i18n="followers">Followers</span>
+                <span class="stat-lab">Seguidores</span>
             </div>
             <div class="stat-box">
                 <span class="stat-val" id="stat-stars">0</span>
-                <span class="stat-lab" data-i18n="stars">Total Stars</span>
+                <span class="stat-lab">Estrellas</span>
             </div>
-        </div>
+        </section>
 
-        <h2 style="margin-bottom:30px" data-i18n="projects">Featured Projects</h2>
-        <div id="repos-container" class="repos-grid"></div>
+        <h2 style="margin-bottom:35px; font-size: 1.8rem;">Proyectos Destacados</h2>
+        <div id="repos-container" class="repos-grid">
+            </div>
     </main>
 
-    <div class="card-wrapper hidden" id="biz-card">
-        <img id="card-avatar" src="" alt="Avatar" id="avatar">
-        <h1 id="card-real-name" style="font-size: 1.8rem;">...</h1>
-        <p id="card-username" style="color:var(--primary); font-weight: 600; font-size: 0.9rem; margin-bottom: 15px;">@usr758</p>
-        <div id="card-bio" style="font-size: 0.85rem; color: var(--text-dim); margin-bottom: 20px;"></div>
-        
-        <div class="card-stats">
-            <div><span class="stat-val" id="c-stat-repos" style="font-size:1.2rem">0</span><span class="stat-lab" data-i18n="repos">Repos</span></div>
-            <div><span class="stat-val" id="c-stat-followers" style="font-size:1.2rem">0</span><span class="stat-lab" data-i18n="followers">Followers</span></div>
-        </div>
-    </div>
-
     <script>
-        /**
-         * SETTINGS
-         */
         const CONFIG = {
             username: 'Little-Night-Wolf',
             excluded: ['Little-Night-Wolf', 'Little-Night-Wolf.github.io'],
-            i18n: {
-                es: {
-                    repos: "Repositorios",
-                    followers: "Seguidores",
-                    stars: "Estrellas",
-                    projects: "Proyectos Destacados",
-                    noDesc: "Sin descripción disponible."
-                },
-                en: {
-                    repos: "Repositories",
-                    followers: "Followers",
-                    stars: "Total Stars",
-                    projects: "Featured Projects",
-                    noDesc: "No description available."
-                },
-                fr: {
-                    repos: "Dépôts",
-                    followers: "Abonnés",
-                    stars: "Étoiles",
-                    projects: "Projets Phares",
-                    noDesc: "Aucune description disponible."
-                }
-            }
+            cacheTime: 60 * 60 * 1000 // 1 hora de caché para evitar bloqueos de API
         };
 
-        /**
-         * TRANSLATION ENGINE
-         */
-        function translateUI() {
-            const lang = navigator.language.split('-')[0];
-            const dict = CONFIG.i18n[lang] || CONFIG.i18n.en;
+        async function getGitHubData() {
+            const cacheKey = `gh_data_${CONFIG.username}`;
+            const cached = localStorage.getItem(cacheKey);
             
-            document.querySelectorAll('[data-i18n]').forEach(el => {
-                const key = el.getAttribute('data-i18n');
-                if(dict[key]) el.innerText = dict[key];
-            });
-            return dict;
-        }
-
-        /**
-         * CORE DATA FETCHING
-         */
-        async function fetchData() {
-            const dict = translateUI();
-            const urlParams = new URLSearchParams(window.location.search);
-            const isCardView = urlParams.get('view') === 'card';
+            if (cached) {
+                const parsed = JSON.parse(cached);
+                if (Date.now() - parsed.timestamp < CONFIG.cacheTime) {
+                    return parsed.data;
+                }
+            }
 
             try {
-                // Fetch User Profile
-                const uRes = await fetch(`https://api.github.com/users/${CONFIG.username}`);
-                const u = await uRes.json();
+                const [userRes, reposRes] = await Promise.all([
+                    fetch(`https://api.github.com/users/${CONFIG.username}`),
+                    fetch(`https://api.github.com/users/${CONFIG.username}/repos?sort=updated&per_page=100`)
+                ]);
 
-                // Fetch Repositories
-                const rRes = await fetch(`https://api.github.com/users/${CONFIG.username}/repos?sort=updated&per_page=100`);
-                const r = await rRes.json();
+                if (!userRes.ok || !reposRes.ok) throw new Error("Error en la API");
 
-                // Process Views
-                if (isCardView) {
-                    document.body.classList.add('mode-card');
-                    document.getElementById('biz-card').classList.remove('hidden');
-                    document.getElementById('card-avatar').src = u.avatar_url;
-                    document.getElementById('card-real-name').innerText = u.name || u.login;
-                    document.getElementById('card-bio').innerText = u.bio || "";
-                    document.getElementById('c-stat-repos').innerText = u.public_repos;
-                    document.getElementById('c-stat-followers').innerText = u.followers;
-                } else {
-                    // Populate Main View
-                    document.getElementById('main-avatar').src = u.avatar_url;
-                    document.getElementById('main-name').innerText = u.name || u.login;
-                    document.getElementById('main-bio').innerText = u.bio || "";
-                    document.getElementById('stat-repos').innerText = u.public_repos;
-                    document.getElementById('stat-followers').innerText = u.followers;
+                const userData = await userRes.json();
+                const reposData = await reposRes.json();
 
-                    // Filter & Render Repos
-                    const filtered = r.filter(repo => !repo.fork && !CONFIG.excluded.includes(repo.name.toLowerCase()));
-                    const totalStars = filtered.reduce((acc, curr) => acc + curr.stargazers_count, 0);
-                    document.getElementById('stat-stars').innerText = totalStars;
+                const finalData = { user: userData, repos: reposData };
+                localStorage.setItem(cacheKey, JSON.stringify({
+                    timestamp: Date.now(),
+                    data: finalData
+                }));
 
-                    const container = document.getElementById('repos-container');
-                    filtered.forEach(repo => {
-                        const card = document.createElement('a');
-                        card.className = 'repo-card';
-                        card.href = repo.html_url;
-                        card.target = '_blank';
-                        card.innerHTML = `
-                            <div class="repo-title">${repo.name}</div>
-                            <p class="repo-desc">${repo.description || dict.noDesc}</p>
-                            <div style="font-size: 0.75rem; color: var(--text-dim)">
-                                <i class="fas fa-circle" style="color:var(--primary); font-size:8px"></i> ${repo.language || 'Code'}
-                                <span style="margin-left: 15px"><i class="far fa-star"></i> ${repo.stargazers_count}</span>
-                            </div>
-                        `;
-                        container.appendChild(card);
-                    });
-                }
-
-                // Hide Loader
-                document.getElementById('loader').style.display = 'none';
-
+                return finalData;
             } catch (err) {
-                console.error("GitHub API Error:", err);
-                document.getElementById('loader').innerHTML = "API Limit reached or Connection Error.";
+                console.error(err);
+                return null;
             }
         }
 
-        // Initialize
-        window.addEventListener('DOMContentLoaded', fetchData);
+        function renderUI(data) {
+            if (!data) {
+                document.getElementById('loader-text').innerText = "Error al conectar con GitHub. Reintenta más tarde.";
+                document.querySelector('.fa-spin').style.display = 'none';
+                return;
+            }
+
+            const { user, repos } = data;
+
+            // Update Profile
+            document.getElementById('main-avatar').src = user.avatar_url;
+            document.getElementById('main-name').innerText = user.name || user.login;
+            document.getElementById('main-bio').innerText = user.bio || "Desarrollador de software apasionado.";
+            document.getElementById('stat-repos').innerText = user.public_repos;
+            document.getElementById('stat-followers').innerText = user.followers;
+
+            // Filter Repos
+            const filteredRepos = repos.filter(repo => 
+                !repo.fork && !CONFIG.excluded.includes(repo.name)
+            ).slice(0, 12); // Limitamos a los 12 más recientes
+
+            const totalStars = filteredRepos.reduce((acc, curr) => acc + curr.stargazers_count, 0);
+            document.getElementById('stat-stars').innerText = totalStars;
+
+            // Render Cards
+            const container = document.getElementById('repos-container');
+            container.innerHTML = ''; // Limpiar
+
+            filteredRepos.forEach(repo => {
+                const card = document.createElement('a');
+                card.className = 'repo-card';
+                card.href = repo.html_url;
+                card.target = '_blank';
+                card.innerHTML = `
+                    <div class="repo-title">${repo.name}</div>
+                    <p class="repo-desc">${repo.description || "Sin descripción disponible."}</p>
+                    <div class="repo-meta">
+                        <span style="display:flex; align-items:center; gap:5px">
+                            <div class="lang-dot"></div> ${repo.language || 'Code'}
+                        </span>
+                        <span><i class="far fa-star"></i> ${repo.stargazers_count}</span>
+                        <span><i class="fas fa-code-branch"></i> ${repo.forks_count}</span>
+                    </div>
+                `;
+                container.appendChild(card);
+            });
+
+            // Ocultar loader con efecto
+            const loader = document.getElementById('loader');
+            loader.style.opacity = '0';
+            setTimeout(() => loader.classList.add('hidden'), 500);
+        }
+
+        // Iniciar
+        window.addEventListener('load', async () => {
+            const data = await getGitHubData();
+            renderUI(data);
+        });
     </script>
 </body>
 </html>
